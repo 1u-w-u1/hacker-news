@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, MessageSquare, Clock, User, ChevronRight } from 'lucide-react';
+import { ExternalLink, MessageSquare, Clock, User, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Story {
@@ -15,16 +15,34 @@ interface Story {
 
 const Home = () => {
     const [stories, setStories] = useState<Story[]>([]);
+    const [allStoryIds, setAllStoryIds] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const storiesPerPage = 30;
 
     useEffect(() => {
-        const fetchStories = async () => {
+        const fetchStoryIds = async () => {
             try {
                 const response = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
                 const ids = await response.json();
-                const topIds = ids.slice(0, 30);
+                setAllStoryIds(ids);
+            } catch (error) {
+                console.error('Error fetching story IDs:', error);
+            }
+        };
+        fetchStoryIds();
+    }, []);
 
-                const storyPromises = topIds.map((id: number) =>
+    useEffect(() => {
+        if (allStoryIds.length === 0) return;
+
+        const fetchStories = async () => {
+            setLoading(true);
+            try {
+                const start = page * storiesPerPage;
+                const pageIds = allStoryIds.slice(start, start + storiesPerPage);
+
+                const storyPromises = pageIds.map((id: number) =>
                     fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(res => res.json())
                 );
 
@@ -38,7 +56,11 @@ const Home = () => {
         };
 
         fetchStories();
-    }, []);
+    }, [allStoryIds, page]);
+
+    const totalPages = Math.ceil(allStoryIds.length / storiesPerPage);
+    const canGoPrev = page > 0;
+    const canGoNext = page < totalPages - 1;
 
     if (loading) {
         return (
@@ -66,8 +88,8 @@ const Home = () => {
                         className="story-card-wrapper"
                     >
                         <div className="story-card glass-panel">
-                            <div className="story-score">
-                                <span>{story.score}</span>
+                            <div className="story-rank">
+                                <span>{page * storiesPerPage + index + 1}</span>
                             </div>
 
                             <div className="story-content">
@@ -104,6 +126,29 @@ const Home = () => {
                         </div>
                     </motion.div>
                 ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="pagination">
+                <button
+                    className="pagination-btn"
+                    onClick={() => setPage(p => p - 1)}
+                    disabled={!canGoPrev}
+                >
+                    <ChevronLeft size={18} />
+                    <span>Previous</span>
+                </button>
+                <span className="pagination-info">
+                    Page {page + 1} of {totalPages}
+                </span>
+                <button
+                    className="pagination-btn"
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={!canGoNext}
+                >
+                    <span>Next</span>
+                    <ChevronRight size={18} />
+                </button>
             </div>
         </div>
     );
