@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Clock, ExternalLink, Send, GripVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -76,6 +76,7 @@ const CommentItem = ({ comment, depth }: { comment: Comment; depth: number }) =>
 
 const Detail = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [story, setStory] = useState<Story | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
@@ -137,7 +138,7 @@ const Detail = () => {
 
                 if (item.kids) {
                     const fetchCommentsRecursive = async (ids: number[], depth: number = 0): Promise<Comment[]> => {
-                        if (depth > 3 || ids.length === 0) return []; // Limit depth to 3 levels
+                        if (depth > 2 || ids.length === 0) return []; // Limit depth to 2 levels
                         const commentsData = await Promise.all(
                             ids.slice(0, depth === 0 ? 15 : 5).map(async (cid: number) => {
                                 const res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${cid}.json`);
@@ -201,10 +202,10 @@ const Detail = () => {
                 animate={{ opacity: 1 }}
                 className="article-viewer"
             >
-                <Link to="/" className="back-btn-overlay">
+                <button onClick={() => navigate(-1)} className="back-btn-overlay">
                     <ArrowLeft size={18} />
-                    <span>Feed</span>
-                </Link>
+                    <span>Back</span>
+                </button>
 
                 {story.url ? (
                     <div className="iframe-wrapper">
