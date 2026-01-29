@@ -142,13 +142,14 @@ const Detail = () => {
                 </div>
 
                 <div className="detail-actions">
-                    <button className="action-btn"><Share2 size={16} /></button>
                     {story.url && (
-                        <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn primary-action-btn" title="Open in New Tab">
+                        <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn" title="Open Article">
                             <ExternalLink size={16} />
-                            <span>Open Original</span>
                         </a>
                     )}
+                    <a href={`https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noopener noreferrer" className="action-btn primary-action-btn" title="View on Hacker News">
+                        <span>Open Hacker News</span>
+                    </a>
                 </div>
 
                 <div className="comment-section">
