@@ -32,6 +32,19 @@ const Detail = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Local simulated auth
 
     useEffect(() => {
+        if (!story?.url) return;
+
+        // Reset state on URL change
+        setIframeError(false);
+
+        const timer = setTimeout(() => {
+            setIframeError(true);
+        }, 5000); // 5 second timeout
+
+        return () => clearTimeout(timer);
+    }, [story?.url]);
+
+    useEffect(() => {
         // Check local storage for persistent simulated login
         const savedLogin = localStorage.getItem('hn_logged_in') === 'true';
         setIsLoggedIn(savedLogin);
@@ -105,8 +118,8 @@ const Detail = () => {
                     <div className="iframe-wrapper">
                         {iframeError ? (
                             <div className="iframe-placeholder">
-                                <h2>Unable to display article</h2>
-                                <p>Site prevents embedding. Standard for many news outlets.</p>
+                                <h2>Unable to display article content</h2>
+                                <p>This site may prevent embedding or is taking too long to respond.</p>
                                 <a href={story.url} target="_blank" rel="noopener noreferrer" className="external-btn">
                                     Open in New Tab
                                 </a>
@@ -115,7 +128,7 @@ const Detail = () => {
                             <iframe
                                 src={story.url}
                                 title={story.title}
-                                onError={() => setIframeError(true)}
+                                onLoad={() => setIframeError(false)}
                             />
                         )}
                     </div>
@@ -149,9 +162,12 @@ const Detail = () => {
 
                 <div className="detail-actions">
                     <button className="action-btn"><Share2 size={16} /></button>
-                    <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn">
-                        <ExternalLink size={16} />
-                    </a>
+                    {story.url && (
+                        <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn primary-action-btn" title="Open in New Tab">
+                            <ExternalLink size={16} />
+                            <span>Open Original</span>
+                        </a>
+                    )}
                 </div>
 
                 <div className="comment-section">

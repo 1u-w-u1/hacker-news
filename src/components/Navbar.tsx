@@ -26,7 +26,7 @@ const Navbar = () => {
                     <div className="logo-box">
                         <Newspaper size={20} color="white" />
                     </div>
-                    <span>Hacker News <span className="premium-tag">Premium</span></span>
+                    <span>Wormhole</span>
                 </Link>
 
                 <div className="nav-actions">

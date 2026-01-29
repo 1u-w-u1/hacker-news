@@ -428,6 +428,44 @@ a {
     border-color: var(--primary);
 }
 
+.iframe-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 40px;
+    text-align: center;
+    background: #12141a;
+}
+
+.iframe-placeholder h2 {
+    margin-bottom: 12px;
+}
+
+.iframe-placeholder p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.external-btn {
+    padding: 12px 24px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.primary-action-btn {
+    flex: 1;
+    background: var(--primary) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border-color: var(--primary) !important;
+    gap: 8px !important;
+    padding: 0 16px !important;
+}
+
 .comment-section h3 {
     margin: 20px 0 15px;
     font-size: 1.1rem;

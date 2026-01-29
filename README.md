@@ -1,6 +1,6 @@
-# Hacker News Premium 🚀
+# Wormhole 🚀
 
-A modern, high-performance Hacker News reader built with React, Vite, and Framer Motion. Featuring a sleek glassmorphism UI and lightning-fast navigation.
+A modern, high-performance web experience built with React, Vite, and Framer Motion. Featuring a sleek glassmorphism UI and lightning-fast navigation.
 
 ## ✨ Features
 
