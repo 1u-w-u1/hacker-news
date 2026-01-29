@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, MessageSquare, Clock, User, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Story {
@@ -78,50 +78,29 @@ const Home = () => {
                 <p>Curated tech news from the community</p>
             </header>
 
-            <div className="story-grid">
+            <div className="story-list">
                 {stories.map((story, index) => (
                     <motion.div
                         key={story.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.02, duration: 0.2 }}
-                        className="story-card-wrapper"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: index * 0.01, duration: 0.15 }}
+                        className="story-item"
                     >
-                        <div className="story-card glass-panel">
-                            <div className="story-rank">
-                                <span>{page * storiesPerPage + index + 1}</span>
-                            </div>
-
-                            <div className="story-content">
-                                <div className="story-meta">
-                                    <span className="story-author"><User size={12} /> {story.by}</span>
-                                    <span className="story-time"><Clock size={12} /> {new Date(story.time * 1000).toLocaleDateString()}</span>
-                                </div>
-
-                                <h2 className="story-title">
-                                    <Link to={`/story/${story.id}`}>{story.title}</Link>
-                                </h2>
-
-                                <div className="story-footer">
-                                    <div className="story-stats">
-                                        <Link to={`/story/${story.id}`} className="stat-item">
-                                            <MessageSquare size={14} />
-                                            <span>{story.descendants || 0} comments</span>
-                                        </Link>
-                                    </div>
-
-                                    <div className="story-actions">
-                                        {story.url && (
-                                            <a href={story.url} target="_blank" rel="noopener noreferrer" className="external-link">
-                                                <ExternalLink size={14} />
-                                            </a>
-                                        )}
-                                        <Link to={`/story/${story.id}`} className="view-detail">
-                                            <span>View</span>
-                                            <ChevronRight size={14} />
-                                        </Link>
-                                    </div>
-                                </div>
+                        <span className="story-rank">{page * storiesPerPage + index + 1}.</span>
+                        <div className="story-content">
+                            <Link to={`/story/${story.id}`} className="story-title">
+                                {story.title}
+                            </Link>
+                            <div className="story-meta">
+                                <span>{story.score} points</span>
+                                <span>by {story.by}</span>
+                                <Link to={`/story/${story.id}`}>{story.descendants || 0} comments</Link>
+                                {story.url && (
+                                    <a href={story.url} target="_blank" rel="noopener noreferrer" className="story-domain">
+                                        ({new URL(story.url).hostname.replace('www.', '')})
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </motion.div>
