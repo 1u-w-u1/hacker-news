@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -14,11 +14,16 @@ interface Story {
 }
 
 const Home = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [stories, setStories] = useState<Story[]>([]);
     const [allStoryIds, setAllStoryIds] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(0);
+    const page = parseInt(searchParams.get('page') || '1', 10) - 1; // 0-indexed internally
     const storiesPerPage = 30;
+
+    const setPage = (newPage: number) => {
+        setSearchParams({ page: String(newPage + 1) });
+    };
 
     useEffect(() => {
         const fetchStoryIds = async () => {
@@ -111,7 +116,7 @@ const Home = () => {
             <div className="pagination">
                 <button
                     className="pagination-btn"
-                    onClick={() => setPage(p => p - 1)}
+                    onClick={() => setPage(page - 1)}
                     disabled={!canGoPrev}
                 >
                     <ChevronLeft size={18} />
@@ -122,7 +127,7 @@ const Home = () => {
                 </span>
                 <button
                     className="pagination-btn"
-                    onClick={() => setPage(p => p + 1)}
+                    onClick={() => setPage(page + 1)}
                     disabled={!canGoNext}
                 >
                     <span>Next</span>
