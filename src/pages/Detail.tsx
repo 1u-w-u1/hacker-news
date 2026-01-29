@@ -22,27 +22,19 @@ interface Story {
     kids?: number[];
 }
 
+const processCommentText = (html: string) => {
+    if (!html) return '';
+    // Add target="_blank" and rel="noopener noreferrer" to all <a> tags
+    return html.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ');
+};
+
 const Detail = () => {
     const { id } = useParams<{ id: string }>();
     const [story, setStory] = useState<Story | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
-    const [iframeError, setIframeError] = useState(false);
     const [newComment, setNewComment] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Local simulated auth
-
-    useEffect(() => {
-        if (!story?.url) return;
-
-        // Reset state on URL change
-        setIframeError(false);
-
-        const timer = setTimeout(() => {
-            setIframeError(true);
-        }, 5000); // 5 second timeout
-
-        return () => clearTimeout(timer);
-    }, [story?.url]);
 
     useEffect(() => {
         // Check local storage for persistent simulated login
@@ -116,21 +108,10 @@ const Detail = () => {
 
                 {story.url ? (
                     <div className="iframe-wrapper">
-                        {iframeError ? (
-                            <div className="iframe-placeholder">
-                                <h2>Unable to display article content</h2>
-                                <p>This site may prevent embedding or is taking too long to respond.</p>
-                                <a href={story.url} target="_blank" rel="noopener noreferrer" className="external-btn">
-                                    Open in New Tab
-                                </a>
-                            </div>
-                        ) : (
-                            <iframe
-                                src={story.url}
-                                title={story.title}
-                                onLoad={() => setIframeError(false)}
-                            />
-                        )}
+                        <iframe
+                            src={story.url}
+                            title={story.title}
+                        />
                     </div>
                 ) : (
                     <div className="text-content-viewer">
@@ -207,7 +188,7 @@ const Detail = () => {
                                 </div>
                                 <div
                                     className="comment-text"
-                                    dangerouslySetInnerHTML={{ __html: comment.text }}
+                                    dangerouslySetInnerHTML={{ __html: processCommentText(comment.text) }}
                                 />
                             </div>
                         ))}

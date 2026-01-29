@@ -76,7 +76,9 @@ const Home = () => {
                                     <span className="story-time"><Clock size={12} /> {new Date(story.time * 1000).toLocaleDateString()}</span>
                                 </div>
 
-                                <h2 className="story-title">{story.title}</h2>
+                                <h2 className="story-title">
+                                    <Link to={`/story/${story.id}`}>{story.title}</Link>
+                                </h2>
 
                                 <div className="story-footer">
                                     <div className="story-stats">
