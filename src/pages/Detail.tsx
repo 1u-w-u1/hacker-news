@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, User, Clock, Share2, ExternalLink, Send } from 'lucide-react';
+import { ArrowLeft, User, Clock, ExternalLink, Send, GripVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Comment {
@@ -82,6 +82,48 @@ const Detail = () => {
     const [newComment, setNewComment] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Local simulated auth
 
+    // Splitter state
+    const [sidebarWidth, setSidebarWidth] = useState(500);
+    const [isDragging, setIsDragging] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseDown = useCallback(() => {
+        setIsDragging(true);
+    }, []);
+
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+        if (!isDragging || !containerRef.current) return;
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const newWidth = containerRect.right - e.clientX;
+        const minWidth = 300;
+        const maxWidth = containerRect.width * 0.6;
+        setSidebarWidth(Math.max(minWidth, Math.min(maxWidth, newWidth)));
+    }, [isDragging]);
+
+    const handleMouseUp = useCallback(() => {
+        setIsDragging(false);
+    }, []);
+
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        } else {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        }
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+    }, [isDragging, handleMouseMove, handleMouseUp]);
+
     useEffect(() => {
         // Check local storage for persistent simulated login
         const savedLogin = localStorage.getItem('hn_logged_in') === 'true';
@@ -152,7 +194,7 @@ const Detail = () => {
     if (!story) return null;
 
     return (
-        <div className="detail-page">
+        <div className="detail-page" ref={containerRef}>
             {/* Article on the LEFT as requested */}
             <motion.div
                 initial={{ opacity: 0 }}
@@ -181,11 +223,20 @@ const Detail = () => {
                 )}
             </motion.div>
 
+            {/* Draggable Splitter */}
+            <div
+                className={`splitter ${isDragging ? 'dragging' : ''}`}
+                onMouseDown={handleMouseDown}
+            >
+                <GripVertical size={16} />
+            </div>
+
             {/* Comments on the RIGHT as requested */}
             <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="detail-sidebar right-sidebar"
+                style={{ width: sidebarWidth, flexShrink: 0 }}
             >
                 <div className="detail-header">
                     <div className="story-meta">

@@ -387,6 +387,35 @@ a {
     background: var(--primary);
 }
 
+/* Draggable Splitter */
+.splitter {
+    width: 12px;
+    background: transparent;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+    color: var(--text-secondary);
+}
+
+.splitter:hover,
+.splitter.dragging {
+    background: var(--glass-bg);
+    color: var(--primary);
+}
+
+.splitter svg {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.splitter:hover svg,
+.splitter.dragging svg {
+    opacity: 1;
+}
+
 /* Comments on RIGHT */
 .detail-sidebar {
     width: 420px;
