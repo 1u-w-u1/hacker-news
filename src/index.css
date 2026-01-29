@@ -471,6 +471,20 @@ a {
 .comment-meta {
     font-size: 0.8rem;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.comment-meta.clickable {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 4px 0;
+    transition: opacity 0.15s;
+}
+
+.comment-meta.clickable:hover {
+    opacity: 0.8;
 }
 
 .comment-author {
@@ -481,6 +495,29 @@ a {
 
 .comment-time {
     color: var(--text-secondary);
+}
+
+.collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    margin-right: 6px;
+}
+
+.collapse-btn:hover {
+    background: var(--glass-bg);
+    color: var(--primary);
+}
+
+.reply-count {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-left: 8px;
 }
 
 .comment-text {
@@ -495,6 +532,7 @@ a {
     text-underline-offset: 2px;
     font-weight: 500;
     transition: opacity 0.2s;
+    word-break: break-all;
 }
 
 .comment-text a:hover {
@@ -502,6 +540,52 @@ a {
 }
 
 .comment-text p {
+    margin-bottom: 8px;
+}
+
+.comment-text code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.85em;
+    word-break: break-word;
+}
+
+.comment-text pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 8px 0;
+    max-width: 100%;
+}
+
+.comment-text pre code {
+    background: none;
+    padding: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.comment-thread {
+    margin-bottom: 12px;
+}
+
+.comment-replies .comment-thread {
+    border-left: 2px solid;
+    padding-left: 12px;
+}
+
+.comment-replies {
+    margin-top: 12px;
+    padding-top: 8px;
+}
+
+.comment-replies .comment-item {
+    background: rgba(255, 255, 255, 0.01);
+    padding: 12px;
+    border-radius: 8px;
     margin-bottom: 8px;
 }
 

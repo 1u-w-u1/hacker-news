@@ -9,6 +9,7 @@ interface Comment {
     text: string;
     time: number;
     kids?: number[];
+    children?: Comment[];
 }
 
 interface Story {
@@ -26,6 +27,51 @@ const processCommentText = (html: string) => {
     if (!html) return '';
     // Add target="_blank" and rel="noopener noreferrer" to all <a> tags
     return html.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ');
+};
+
+const CommentItem = ({ comment, depth }: { comment: Comment; depth: number }) => {
+    const [isExpanded, setIsExpanded] = useState(true);
+    const hasReplies = comment.children && comment.children.length > 0;
+
+    // Different colors for different nesting levels
+    const depthColors = ['#ff6600', '#9b59b6', '#3498db', '#2ecc71', '#e74c3c'];
+    const borderColor = depthColors[depth % depthColors.length];
+
+    return (
+        <div
+            className="comment-thread"
+            style={{
+                marginLeft: depth > 0 ? 16 : 0,
+                borderLeftColor: depth > 0 ? borderColor : 'transparent'
+            }}
+        >
+            <div className={`comment-item ${depth === 0 ? 'glass-panel' : ''}`}>
+                <div
+                    className={`comment-meta ${hasReplies ? 'clickable' : ''}`}
+                    onClick={hasReplies ? () => setIsExpanded(!isExpanded) : undefined}
+                >
+                    <span className="comment-author">{comment.by}</span>
+                    <span className="comment-time">{new Date(comment.time * 1000).toLocaleTimeString()}</span>
+                    {hasReplies && (
+                        <span className="reply-count">
+                            {isExpanded ? '▼' : '▶'} {comment.children!.length} replies
+                        </span>
+                    )}
+                </div>
+                <div
+                    className="comment-text"
+                    dangerouslySetInnerHTML={{ __html: processCommentText(comment.text) }}
+                />
+            </div>
+            {hasReplies && isExpanded && (
+                <div className="comment-replies">
+                    {comment.children!.map((child) => (
+                        <CommentItem key={child.id} comment={child} depth={depth + 1} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 };
 
 const Detail = () => {
@@ -48,11 +94,23 @@ const Detail = () => {
                 setStory(item);
 
                 if (item.kids) {
-                    const commentPromises = item.kids.slice(0, 10).map((cid: number) =>
-                        fetch(`https://hacker-news.firebaseio.com/v0/item/${cid}.json`).then(res => res.json())
-                    );
-                    const fetchedComments = await Promise.all(commentPromises);
-                    setComments(fetchedComments.filter(c => c && !c.deleted));
+                    const fetchCommentsRecursive = async (ids: number[], depth: number = 0): Promise<Comment[]> => {
+                        if (depth > 3 || ids.length === 0) return []; // Limit depth to 3 levels
+                        const commentsData = await Promise.all(
+                            ids.slice(0, depth === 0 ? 15 : 5).map(async (cid: number) => {
+                                const res = await fetch(`https://hacker-news.firebaseio.com/v0/item/${cid}.json`);
+                                const comment = await res.json();
+                                if (!comment || comment.deleted || comment.dead) return null;
+                                if (comment.kids && comment.kids.length > 0) {
+                                    comment.children = await fetchCommentsRecursive(comment.kids, depth + 1);
+                                }
+                                return comment;
+                            })
+                        );
+                        return commentsData.filter((c): c is Comment => c !== null);
+                    };
+                    const fetchedComments = await fetchCommentsRecursive(item.kids);
+                    setComments(fetchedComments);
                 }
                 setLoading(false);
             } catch (error) {
@@ -142,14 +200,14 @@ const Detail = () => {
                 </div>
 
                 <div className="detail-actions">
+                    <a href={`https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noopener noreferrer" className="action-btn" title="View on Hacker News">
+                        <ExternalLink size={16} />
+                    </a>
                     {story.url && (
-                        <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn" title="Open Article">
-                            <ExternalLink size={16} />
+                        <a href={story.url} target="_blank" rel="noopener noreferrer" className="action-btn primary-action-btn" title="Open Article">
+                            <span>Open Article</span>
                         </a>
                     )}
-                    <a href={`https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noopener noreferrer" className="action-btn primary-action-btn" title="View on Hacker News">
-                        <span>Open Hacker News</span>
-                    </a>
                 </div>
 
                 <div className="comment-section">
@@ -182,16 +240,7 @@ const Detail = () => {
 
                     <div className="comment-list">
                         {comments.map((comment) => (
-                            <div key={comment.id} className="comment-item glass-panel">
-                                <div className="comment-meta">
-                                    <span className="comment-author">{comment.by}</span>
-                                    <span className="comment-time">{new Date(comment.time * 1000).toLocaleTimeString()}</span>
-                                </div>
-                                <div
-                                    className="comment-text"
-                                    dangerouslySetInnerHTML={{ __html: processCommentText(comment.text) }}
-                                />
-                            </div>
+                            <CommentItem key={comment.id} comment={comment} depth={0} />
                         ))}
                     </div>
                 </div>
