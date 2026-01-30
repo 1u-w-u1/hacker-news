@@ -9,7 +9,7 @@ const Navbar = () => {
                     <div className="logo-box">
                         <Newspaper size={20} color="white" />
                     </div>
-                    <span>Wormhole</span>
+                    <span>Hacker News</span>
                 </Link>
             </div>
         </nav>

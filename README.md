@@ -1,4 +1,4 @@
-# Wormhole 🚀
+# Hacker News 🚀
 
 A modern, high-performance web experience built with React, Vite, and Framer Motion. Featuring a sleek glassmorphism UI and lightning-fast navigation.
 
