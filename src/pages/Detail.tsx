@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Clock, ExternalLink, Send, GripVertical } from 'lucide-react';
+import { ArrowLeft, User, Clock, ExternalLink, GripVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Comment {
@@ -80,8 +80,6 @@ const Detail = () => {
     const [story, setStory] = useState<Story | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
-    const [newComment, setNewComment] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // Local simulated auth
 
     // Splitter state
     const [sidebarWidth, setSidebarWidth] = useState(500);
@@ -126,10 +124,6 @@ const Detail = () => {
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
     useEffect(() => {
-        // Check local storage for persistent simulated login
-        const savedLogin = localStorage.getItem('hn_logged_in') === 'true';
-        setIsLoggedIn(savedLogin);
-
         const fetchStoryDetail = async () => {
             try {
                 const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
@@ -164,24 +158,6 @@ const Detail = () => {
 
         fetchStoryDetail();
     }, [id]);
-
-    const handlePostComment = () => {
-        if (!isLoggedIn) {
-            alert('Please login first to leave a comment!');
-            return;
-        }
-        if (!newComment.trim()) return;
-
-        const fakeComment: Comment = {
-            id: Math.random(),
-            by: 'You (Preview)',
-            text: newComment,
-            time: Math.floor(Date.now() / 1000)
-        };
-
-        setComments([fakeComment, ...comments]);
-        setNewComment('');
-    };
 
     if (loading) {
         return (
@@ -264,31 +240,6 @@ const Detail = () => {
 
                 <div className="comment-section">
                     <h3>Community Discussion</h3>
-
-                    <div className="add-comment glass-panel">
-                        <textarea
-                            placeholder={isLoggedIn ? "Write a comment..." : "Login to join the discussion"}
-                            rows={3}
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            disabled={!isLoggedIn}
-                        />
-                        <div className="comment-controls">
-                            {!isLoggedIn && (
-                                <button className="login-prompt-btn" onClick={() => {
-                                    localStorage.setItem('hn_logged_in', 'true');
-                                    setIsLoggedIn(true);
-                                    window.location.reload(); // Refresh to update navbar
-                                }}>
-                                    Login
-                                </button>
-                            )}
-                            <button className="post-btn" onClick={handlePostComment} disabled={!isLoggedIn || !newComment.trim()}>
-                                <Send size={14} />
-                                <span>Post</span>
-                            </button>
-                        </div>
-                    </div>
 
                     <div className="comment-list">
                         {comments.map((comment) => (
