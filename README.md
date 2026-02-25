@@ -65,7 +65,7 @@ A modern, high-performance Hacker News client built with React, Vite, and Framer
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/1u-w-u1/hacker-news.git
+   git clone ...
    cd hacker-news
    ```
 
