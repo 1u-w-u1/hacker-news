@@ -2,8 +2,6 @@
 
 A modern, high-performance Hacker News client built with React, Vite, and Framer Motion. Featuring a sleek glassmorphism UI, smooth animations, and an intuitive split-view reader.
 
-🔗 **[Live Demo](https://1u-w-u1.github.io/hacker-news/)**
-
 ---
 
 ## ✨ Features
